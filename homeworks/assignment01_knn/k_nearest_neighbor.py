@@ -75,7 +75,7 @@ class KNearestNeighbor:
                 # not use a loop over dimension, nor use np.linalg.norm().          #
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+                dists[i,j] = np.sqrt(np.sum(np.emath.power((X[i] - self.X_train[j]),2)))
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -97,7 +97,7 @@ class KNearestNeighbor:
             # Do not use np.linalg.norm().                                        #
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+            dists[i] = np.sqrt(np.sum(np.emath.power((X[i]-self.X_train),2),axis=1))
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -125,7 +125,10 @@ class KNearestNeighbor:
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        test_normsq = np.diag(X @ X.T).reshape((num_test,1)) 
+        train_normsq = np.diag(self.X_train @ self.X_train.T)
+        dot_ij = X @ self.X_train.T 
+        dists = np.sqrt((test_normsq + train_normsq) - 2*dot_ij)
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -155,7 +158,8 @@ class KNearestNeighbor:
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+            nbs = dists[i,:]
+            closest_y=self.y_train[np.argsort(nbs)[:k]]
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             #########################################################################
             # TODO:                                                                 #
@@ -165,8 +169,20 @@ class KNearestNeighbor:
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
-
+            score = [0] * 10
+            freq_label = 10
+            max_score = 0
+            for label in closest_y:
+                score[int(label)] += 1
+                if score[int(label)] >  max_score:
+                    max_score = score[int(label)]
+                    freq_label = label
+                elif score[int(label)] == max_score:
+                    if label < freq_label:
+                        freq_label=label
+                else:
+                    continue
+            y_pred[i] = freq_label
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
         return y_pred
