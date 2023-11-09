@@ -10,7 +10,12 @@ class LaplaceDistribution:
         '''
         ####
         # Do not change the class outside of this block
-        # Your code here
+        N, D = x.shape
+        if N % 2 == 1:
+            median = np.sort(x,axis = 0)[(N-1)//2]
+        else:
+            median = np.sort(x,axis = 0)[[N//2,N//2 - 1]].mean(axis=0)
+        return np.abs(x - median).mean(axis=0)# Your code here
         ####
 
     def __init__(self, features):
@@ -20,8 +25,9 @@ class LaplaceDistribution:
         '''
         ####
         # Do not change the class outside of this block
-        self.loc = # YOUR CODE HERE
-        self.scale = # YOUR CODE HERE
+        N = features.shape[0]
+        self.loc = np.sort(features,axis = 0)[(N-1)//2] if N % 2 == 1 else np.sort(features,axis = 0)[[N//2,N//2 - 1]].mean(axis=0)# YOUR CODE HERE
+        self.scale = np.abs(features - self.loc).mean(axis=0)# YOUR CODE HERE
         ####
 
 
@@ -33,7 +39,7 @@ class LaplaceDistribution:
         '''
         ####
         # Do not change the class outside of this block
-        return 
+        return -np.log(2*self.scale) - np.absolute(values-self.loc)/self.scale
         ####
         
     
