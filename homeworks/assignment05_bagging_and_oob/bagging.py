@@ -11,16 +11,19 @@ class SimplifiedBaggingRegressor:
         '''
         self.indices_list = []
         data_length = len(data)
+        rng = np.random.default_rng()
         for bag in range(self.num_bags):
             # Your Code Here
-        
+            self.indices_list.append(rng.integers(data_length-1,size=data_length))
+
+
     def fit(self, model_constructor, data, target):
         '''
         Fit model on every bag.
         Model constructor with no parameters (and with no ()) is passed to this function.
-        
+
         example:
-        
+
         bagging_regressor = SimplifiedBaggingRegressor(num_bags=10, oob=True)
         bagging_regressor.fit(LinearRegression, X, y)
         '''
@@ -32,40 +35,56 @@ class SimplifiedBaggingRegressor:
         self.models_list = []
         for bag in range(self.num_bags):
             model = model_constructor()
-            data_bag, target_bag = # Your Code Here
+            data_bag, target_bag = data[self.indices_list[bag]], target[self.indices_list[bag]]# Your Code Here
             self.models_list.append(model.fit(data_bag, target_bag)) # store fitted models here
         if self.oob:
             self.data = data
             self.target = target
-        
+
     def predict(self, data):
         '''
         Get average prediction for every object from passed dataset
         '''
         # Your code here
-    
+        prediction = 0
+        for model in self.models_list:
+            prediction += model.predict(data)
+        return prediction / self.num_bags
+
     def _get_oob_predictions_from_every_model(self):
         '''
         Generates list of lists, where list i contains predictions for self.data[i] object
         from all models, which have not seen this object during training phase
         '''
-        list_of_predictions_lists = [[] for _ in range(len(self.data))]
+      #  print(self.models_list[0].predict(self.data[0]))
+        list_of_predictions_lists = [[self.models_list[j].predict(self.data[i][np.newaxis,:]) for j in range(self.num_bags)
+                                      if i not in self.indices_list[j]] for i in range(len(self.data))]
+
         # Your Code Here
-        
+
         self.list_of_predictions_lists = np.array(list_of_predictions_lists, dtype=object)
-    
+
+
     def _get_averaged_oob_predictions(self):
         '''
         Compute average prediction for every object from training set.
         If object has been used in all bags on training phase, return None instead of prediction
         '''
         self._get_oob_predictions_from_every_model()
-        self.oob_predictions = # Your Code Here
-        
-        
+        self.oob_predictions = np.array([np.mean(x) for x in self.list_of_predictions_lists])
+        # Your Code Here
+
+
     def OOB_score(self):
         '''
         Compute mean square error for all objects, which have at least one prediction
         '''
         self._get_averaged_oob_predictions()
-        return # Your Code Here
+        se = (self.target - self.oob_predictions)**2
+        N=0
+        s = 0
+        for i in range(len(se)):
+            if not np.isnan(se[i]):
+                s+=se[i]
+                N+=1
+        return s/N # Your Code Here
