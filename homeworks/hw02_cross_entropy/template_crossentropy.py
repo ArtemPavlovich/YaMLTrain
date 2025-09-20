@@ -28,7 +28,7 @@ def select_elites(states_batch, actions_batch, rewards_batch, percentile=50):
 
     return elite_states, elite_actions
 
-def update_policy(elite_states, elite_actions, n_states, n_actions):
+def update_policy(elite_states, elite_actions, n_states=n_states, n_actions=n_actions):
     """
     Given old policy and a list of elite states/actions from select_elites,
     return new updated policy where each action probability is proportional to
