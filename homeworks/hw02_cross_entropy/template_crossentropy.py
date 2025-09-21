@@ -49,7 +49,7 @@ def update_policy(elite_states, elite_actions, n_states=n_states, n_actions=n_ac
     :param n_states: number of states in the environment
     :param n_actions: number of actions in the environment
 
-    :returns: new_policy: np.array of shape (n_states, n_actions)
+    :returns: policy: np.array of shape (n_states, n_actions)
     """
     # your code here
     policy = np.ones((n_states, n_actions)) / n_actions
@@ -70,7 +70,7 @@ def update_policy(elite_states, elite_actions, n_states=n_states, n_actions=n_ac
             tot += freq[s][a]
             policy[s,a] = freq[s][a]
         policy[s] /= tot
-    assert new_policy is not None
+    assert policy is not None
     # your code here
 
     return policy
