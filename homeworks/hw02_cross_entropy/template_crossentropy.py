@@ -22,7 +22,13 @@ def select_elites(states_batch, actions_batch, rewards_batch, percentile=50):
     (they will become different later).
     """
     # your code here
-    elite_states, elite_actions = None, None
+    pivot = np.percentile(np.array(rewards_batch), percentile)
+    elite_states = []
+    elite_actions = []
+    for i in range(len(rewards_batch)):
+        if rewards_batch[i] >= pivot:
+            elite_states.extend(states_batch[i])
+            elite_actions.extend(actions_batch[i])
     assert elite_states is not None and elite_actions is not None
     # your code here
 
@@ -46,11 +52,28 @@ def update_policy(elite_states, elite_actions, n_states=n_states, n_actions=n_ac
     :returns: new_policy: np.array of shape (n_states, n_actions)
     """
     # your code here
-    new_policy = None
+    policy = np.ones((n_states, n_actions)) / n_actions
+    
+    freq = {}
+    for s, a in zip(elite_states, elite_actions):
+        if s not in freq:
+            freq[s] = {}
+        if a not in freq[s]:
+            freq[s][a] = 1
+        else:
+            freq[s][a] += 1
+    
+    for s in freq:
+        policy[s] = 0
+        tot = 0
+        for a in freq[s]:
+            tot += freq[s][a]
+            policy[s,a] = freq[s][a]
+        policy[s] /= tot
     assert new_policy is not None
     # your code here
 
-    return new_policy
+    return policy
 
 def generate_session(env, policy, t_max=int(10**4)):
     """
