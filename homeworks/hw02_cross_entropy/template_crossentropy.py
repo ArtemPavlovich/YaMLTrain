@@ -90,8 +90,8 @@ def generate_session(env, policy, t_max=int(10**4)):
 
     for t in range(t_max):
         # your code here - sample action from policy and get new state, reward, done flag etc. from the environment
-        new_s, r, done = None, None, None
-        a = None
+        a = np.random.choice(policy.shape[1],p=policy[s])
+        new_s, r, done, truncated, info = env.step(a)
         assert new_s is not None and r is not None and done is not None
         assert a is not None
         # your code here
